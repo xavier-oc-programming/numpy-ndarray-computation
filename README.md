@@ -41,31 +41,32 @@ Open any notebook in `theory/` to read the annotated lesson notes.
 ## 2. Analysis flow
 
 ```
-yummy_macarons.jpg          scipy.datasets.face()
-        │                           │
-        ▼                           ▼
- PIL Image.open()           scipy datasets API
-        │                           │
-        └───────────┬───────────────┘
-                    ▼
-             np.array(img)
-                    │
-          shape: (H, W, 3)   ← 3D ndarray (RGB)
-                    │
-        ┌───────────┼───────────────┐
-        ▼           ▼               ▼
-   / 255      np.flip()        255 - img
-  sRGB arr   (flip upside     (solarize /
-      │       down)            colour invert)
-      ▼
-  @ grey_vals                 np.rot90(img)
-  [0.2126,                    (rotate 90°)
-   0.7152,
-   0.0722]
-      │
-      ▼
-  greyscale ndarray
-  plt.imshow(cmap='gray')
+│
+│  ── Ingestion ──────────────────────────────────────────────────────────
+├── PIL Image.open()            →  loads yummy_macarons.jpg as a PIL Image object
+├── scipy.datasets.face()       →  loads built-in raccoon sample image
+│
+│  ── Array Conversion ───────────────────────────────────────────────────
+├── np.array(img)               →  converts PIL / SciPy image to 3D ndarray (H, W, 3)
+├── .shape  /  .ndim            →  inspects axis sizes and number of dimensions
+│
+│  ── Normalisation ──────────────────────────────────────────────────────
+├── img / 255                   →  scales pixel values from [0, 255] to [0, 1]  (sRGB)
+│
+│  ── Greyscale Conversion ───────────────────────────────────────────────
+├── sRGB_array @ grey_vals      →  dot product with [0.2126, 0.7152, 0.0722] collapses RGB → luminance
+├── plt.imshow(cmap='gray')     →  renders 2D luminance array as a greyscale image
+│
+│  ── Spatial Transforms ─────────────────────────────────────────────────
+├── np.flip(img_gray)           →  reverses the array along axis 0 (flips upside down)
+├── np.rot90(img)               →  rotates the colour image 90° counter-clockwise
+│
+│  ── Pixel Transforms ───────────────────────────────────────────────────
+├── 255 - img                   →  inverts every pixel value  (solarize / colour inversion)
+│
+│  ── Visualisation ──────────────────────────────────────────────────────
+├── plt.imshow()                →  displays any ndarray as an image in the notebook
+└── plt.plot(x, y)              →  plots 1D NumPy vectors as a line chart
 ```
 
 ---
