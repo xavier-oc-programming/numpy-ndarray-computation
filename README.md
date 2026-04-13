@@ -1,4 +1,4 @@
-# numpy-ndarray-computation
+# NumPy NDArray Computation
 
 Hands-on NumPy exercises covering ndarray creation, manipulation, broadcasting, matrix multiplication, and image processing.
 
