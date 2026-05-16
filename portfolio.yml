@@ -1,0 +1,37 @@
+title: NumPy NDArray Computation
+slug: numpy-ndarray-computation
+category: data
+date: 2026-05-16
+featured: false
+tags: data-analysis, visualisation, python, CI-CD
+tech_stack: Python, NumPy, Matplotlib, SciPy, Pillow, Jupyter, GitHub Actions
+repo_url: https://github.com/xavier-oc-programming/numpy-ndarray-computation
+live_url: https://xavier-oc-programming.github.io/numpy-ndarray-computation/notebook/
+demo_url:
+notebook_url: https://xavier-oc-programming.github.io/numpy-ndarray-computation/notebook/
+
+short_description: |
+  NumPy treats images as numbers — a 768 × 1024 photograph is a 3D array of integers. This project works through ndarray operations from first principles: slicing, broadcasting, matrix multiplication, and pixel-level transforms like greyscale conversion and colour inversion.
+
+full_description: |
+  At its core, this project asks a deceptively simple question: what actually is a digital image? The answer turns out to be a rank-3 tensor of integers — and once that's established, every image transformation becomes a straightforward array operation. The analysis works through NumPy's ndarray from the ground up, covering 1D vectors, 2D matrices, and 3D tensors, then applies the same ideas to real image data loaded from both SciPy's built-in datasets and a custom photograph.
+
+  The findings are concrete. A 768 × 1024 colour photograph contains 2,359,296 individual integer values. Converting it to greyscale requires a single dot product against three luminance weights — `sRGB_array @ [0.2126, 0.7152, 0.0722]` — collapsing the `(768, 1024, 3)` array to `(768, 1024)` in one step. Colour inversion is `255 - img`, applied simultaneously to all pixels via broadcasting. Spatial transforms — flipping, rotating — operate directly on array axes, with no pixel loop in sight.
+
+problem: |
+  Image processing libraries abstract away the underlying data structure, making it easy to apply transforms without understanding what they actually compute. The analytical problem is to make that structure explicit: represent images as raw numerical arrays and implement every transformation — normalisation, greyscale conversion, spatial flips, colour inversion — as a direct mathematical operation on the array values, so the relationship between the computation and the visual result is transparent.
+
+solution: |
+  Each image transformation is implemented as a NumPy array operation. Normalisation divides pixel values by 255 to map the range [0, 255] to [0, 1]. Greyscale conversion uses a dot product with ITU-R BT.709 luminance weights (0.2126 R, 0.7152 G, 0.0722 B), which weights green more heavily because human vision is most sensitive to it. Spatial transforms use `np.flip()` and `np.rot90()`, which return array views rather than copies, avoiding memory allocation. Colour inversion uses broadcasting: subtracting the entire array from 255 in a single vectorised operation.
+
+challenges: |
+  The greyscale conversion requires choosing the right luminance formula. Simple averaging (`(R + G + B) / 3`) produces incorrect perceptual brightness because human vision is not equally sensitive to all channels. The ITU-R BT.709 formula weights channels by their perceived luminance contribution, which is why the green weight (0.7152) is nearly ten times the blue weight (0.0722). Getting this right required understanding the difference between photometric and perceptual colour models, not just applying a formula.
+
+results: |
+  - The raccoon image (scipy.datasets.face()) is 768 × 1024 px — 786,432 pixels, or 2,359,296 individual uint8 values across 3 channels
+  - The custom macaron photograph is 533 × 799 px — 426,267 pixels total
+  - Greyscale conversion via luminance dot product reduces the data volume by two-thirds: (768, 1024, 3) → (768, 1024)
+  - Broadcasting applies 255 - img to all 2,359,296 pixel values simultaneously with no Python loop
+  - Matrix multiplication (4×2) @ (2×3) = (4×3) verified computationally with both np.matmul() and the @ operator producing identical results
+  - np.linspace(0, 100, 9) produces exactly [0.0, 12.5, 25.0, 37.5, 50.0, 62.5, 75.0, 87.5, 100.0] — 9 values, both endpoints included
+  - All 9 charts saved to plots/ at 150 dpi; notebook rendered to HTML and deployed via GitHub Actions on every push to main

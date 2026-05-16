@@ -1,30 +1,16 @@
+![NumPy](https://img.shields.io/badge/NumPy-blue) ![Matplotlib](https://img.shields.io/badge/Matplotlib-orange) ![SciPy](https://img.shields.io/badge/SciPy-blue) ![Pillow](https://img.shields.io/badge/Pillow-blue) ![Jupyter](https://img.shields.io/badge/Jupyter-orange) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-black)
+
 # NumPy NDArray Computation
 
-Hands-on NumPy exercises covering ndarray creation, manipulation, broadcasting, matrix multiplication, and image processing.
+Images are just numbers — and NumPy makes that concrete. A 768 × 1024 photograph of a raccoon is a `(768, 1024, 3)` array of integers; converting it to greyscale is a single dot product against three luminance weights; inverting it is `255 - img`. This project works through that idea from first principles, starting with 1D vectors and ending with real pixel transformations on two images.
 
-This project explores how NumPy's `ndarray` works as the foundation for numerical computation in Python. The analysis investigates how n-dimensional arrays can be created, inspected, sliced, and operated on — from simple 1D vectors through 3D tensors — and demonstrates how the same mathematical model applies directly to real-world image data. Exercises answer questions such as: how do NumPy arrays differ from Python lists, how does broadcasting enable scalar operations on entire arrays, how does matrix multiplication work in practice, and how can images be represented and transformed as numerical arrays?
+The analysis covers the full range of ndarray operations: creation and inspection, slicing and indexing, broadcasting, matrix multiplication, and image manipulation. Every transformation — greyscale conversion using the ITU-R BT.709 luminance formula, spatial flips and rotations, colour inversion — is implemented as a direct array operation with no image library doing the heavy lifting.
 
-The dataset for this project is a custom photograph (`yummy_macarons.jpg`, ~111 KB) used to demonstrate real-world ndarray manipulation. In addition, a raccoon image is loaded directly from SciPy's built-in datasets (`scipy.datasets.face()`). No data cleaning is required — both images are loaded as raw pixel arrays using NumPy's numeric representation, and transformations (greyscale conversion, flipping, rotating, colour inversion) are applied directly to the resulting ndarray values.
-
-No external services or API keys are required. All computation is fully local using NumPy, SciPy, Matplotlib, and Pillow.
+The custom photograph (`yummy_macarons.jpg`, `533 × 799` px, 3 channels) is colour-inverted using `255 - img_array`. The SciPy raccoon image (`768 × 1024` px) is converted to greyscale via `sRGB_array @ [0.2126, 0.7152, 0.0722]`, flipped with `np.flip()`, rotated with `np.rot90()`, and solarised with `255 - img`. All computation is local — no external services or API keys required.
 
 ---
 
-## Table of Contents
-
-1. [Quick start](#1-quick-start)
-2. [Analysis flow](#2-analysis-flow)
-3. [Features](#3-features)
-4. [Dataset schema](#4-dataset-schema)
-5. [Architecture](#5-architecture)
-6. [Notebook reference](#6-notebook-reference)
-7. [Configuration reference](#7-configuration-reference)
-8. [Course context](#8-course-context)
-9. [Dependencies](#9-dependencies)
-
----
-
-## 1. Quick start
+## Quick Start
 
 ```bash
 git clone https://github.com/xavier-oc-programming/numpy-ndarray-computation.git
@@ -33,12 +19,12 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-Open `practice/A_01_NumPy_Exercises.ipynb` to run the exercises.  
-Open any notebook in `theory/` to read the annotated lesson notes.
+Open `notebooks/analysis/A_01_NumPy_Exercises.ipynb` to run the analysis.  
+Open any notebook in `notebooks/concepts/` to read the annotated reference notes.
 
 ---
 
-## 2. Analysis flow
+## Analysis Flow
 
 ```
 │
@@ -66,29 +52,24 @@ Open any notebook in `theory/` to read the annotated lesson notes.
 │
 │  ── Visualisation ──────────────────────────────────────────────────────
 ├── plt.imshow()                →  displays any ndarray as an image in the notebook
-└── plt.plot(x, y)              →  plots 1D NumPy vectors as a line chart
+├── plt.plot(x, y)              →  plots 1D NumPy vectors as a line chart
+└── plt.savefig()               →  saves all charts to plots/ at 150 dpi
 ```
 
 ---
 
-## 3. Features
+## Key Findings
 
-- Create 1D, 2D, and 3D ndarrays manually and with generator functions
-- Slice, reverse, and subset arrays using Python index syntax
-- Find non-zero element indices with `np.nonzero()`
-- Generate random arrays of arbitrary shape
-- Create evenly spaced vectors with `np.arange()` and `np.linspace()`
-- Plot NumPy arrays directly with Matplotlib
-- Perform element-wise arithmetic on arrays (broadcasting)
-- Multiply matrices using `@` operator and `np.matmul()`
-- Load a raccoon image from SciPy and inspect its pixel array shape
-- Convert an RGB image to greyscale using luminance-weighted dot product
-- Flip, rotate, and invert (solarize) images as pure array operations
-- Load a custom JPEG with Pillow and invert its colours
+- A colour image is a rank-3 tensor of shape `(H, W, 3)` — every pixel is three integers
+- Greyscale conversion via luminance dot product collapses the last axis: `(768, 1024, 3)` → `(768, 1024)`
+- Broadcasting lets a scalar operation (`255 - img`) transform all 2,359,296 pixel values simultaneously
+- Matrix multiplication with `@` produces a `(4, 3)` result from `(4, 2) @ (2, 3)` in one line
+- `np.linspace(0, 100, 9)` produces `[0, 12.5, 25, …, 100]` — 9 evenly spaced floats including both endpoints
+- The macaron photograph is `533 × 799` px (`426,267` pixels total); the raccoon image is `768 × 1024` px (`786,432` pixels)
 
 ---
 
-## 4. Dataset schema
+## Dataset Schema
 
 ### `data/yummy_macarons.jpg`
 
@@ -96,9 +77,9 @@ Not a tabular dataset — an RGB image loaded as a NumPy ndarray.
 
 | Property | Value | Description |
 |---|---|---|
-| Shape | `(H, W, 3)` | Height × Width × RGB channels |
+| Shape | `(533, 799, 3)` | Height × Width × RGB channels |
 | Dtype | `uint8` | Pixel values 0–255 per channel |
-| Source | Local photograph | Custom image used to practise ndarray ops |
+| Source | Local photograph | Custom image used to demonstrate ndarray ops |
 
 ### SciPy raccoon image (`scipy.datasets.face()`)
 
@@ -119,79 +100,84 @@ Not a tabular dataset — an RGB image loaded as a NumPy ndarray.
 
 ---
 
-## 5. Architecture
+## Architecture
 
 ```
 numpy-ndarray-computation/
 │
-├── theory/                                   # Annotated lesson notes
-│   ├── 00__Overview.ipynb                    # Day goals and NumPy context
-│   ├── 01__NumPy_ndarray.ipynb               # ndarray concept, import setup
-│   ├── 02__Generating_Manipulating_ndarrays.ipynb  # arange, linspace, random, slicing
-│   ├── 03__Broadcasting_Matrix_Multiplication.ipynb # Vectors, scalars, matmul
-│   ├── 04__Images_as_ndarrays.ipynb          # Images as 3D arrays, transformations
-│   └── 05__Summary.ipynb                     # Lesson wrap-up and key takeaways
-│
-├── practice/
-│   └── A_01_NumPy_Exercises.ipynb            # Student exercises with solutions
+├── notebooks/
+│   ├── analysis/
+│   │   └── A_01_NumPy_Exercises.ipynb    # Main analysis notebook
+│   └── concepts/
+│       ├── 00__Overview.ipynb            # NumPy context and scope
+│       ├── 01__NumPy_ndarray.ipynb       # ndarray concept, import setup
+│       ├── 02__Generating_Manipulating_ndarrays.ipynb  # arange, linspace, random, slicing
+│       ├── 03__Broadcasting_Matrix_Multiplication.ipynb # Vectors, scalars, matmul
+│       ├── 04__Images_as_ndarrays.ipynb  # Images as 3D arrays, transformations
+│       └── 05__Summary.ipynb             # Key takeaways
 │
 ├── data/
-│   └── yummy_macarons.jpg                    # Custom image for PIL loading exercise
+│   └── yummy_macarons.jpg                # Custom image for PIL loading
+│
+├── plots/                                # All saved charts (150 dpi)
+│
+├── notebook/
+│   └── index.html                        # Rendered notebook (GitHub Pages)
 │
 ├── docs/
-│   └── COURSE_NOTES.md                       # Original exercise brief and key concepts
+│   └── COURSE_NOTES.md                   # Reference notes
 │
-├── requirements.txt                          # Pinned package versions
+├── .github/workflows/
+│   └── publish_notebook.yml              # CI/CD: render and deploy on push
+│
+├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
 ---
 
-## 6. Notebook reference
+## Visualisations
 
-### theory/
+All charts are saved to `plots/` at 150 dpi.
 
-| Notebook | Key methods covered | Question answered |
-|---|---|---|
-| `00__Overview.ipynb` | — | What will we build and why does NumPy matter? |
-| `01__NumPy_ndarray.ipynb` | `np.array()`, `.shape`, `.ndim`, indexing | What is an ndarray and how is it structured? |
-| `02__Generating_Manipulating_ndarrays.ipynb` | `np.arange()`, `np.linspace()`, `np.random.random()`, `np.nonzero()`, `np.flip()`, slicing | How do you generate and reshape arrays efficiently? |
-| `03__Broadcasting_Matrix_Multiplication.ipynb` | `+`, `*`, scalar ops, `@`, `np.matmul()` | How does NumPy handle arithmetic across arrays of different shapes? |
-| `04__Images_as_ndarrays.ipynb` | `scipy.datasets.face()`, `plt.imshow()`, `np.rot90()`, `np.flip()`, sRGB dot product | How are images represented and manipulated as ndarrays? |
-| `05__Summary.ipynb` | — | What were the key takeaways from this lesson? |
-
-### practice/
-
-| Notebook | Key methods covered | Question answered |
-|---|---|---|
-| `A_01_NumPy_Exercises.ipynb` | Full set: `np.array()`, `np.arange()`, `np.linspace()`, `np.random.random()`, `np.nonzero()`, `np.flip()`, `np.rot90()`, `@`, `np.matmul()`, `Image.open()` | All 12 challenges from the course day — ndarray creation through image inversion |
+| File | Description |
+|---|---|
+| `plots/line_chart.png` | `x` vs `y` — linspace vectors plotted as a line chart |
+| `plots/noise_image.png` | 128 × 128 × 3 random float array displayed as colour noise |
+| `plots/raccoon_original.png` | SciPy raccoon image in colour |
+| `plots/raccoon_greyscale.png` | Raccoon converted to greyscale via luminance dot product |
+| `plots/raccoon_flipped.png` | Greyscale raccoon flipped upside down with `np.flip()` |
+| `plots/raccoon_rotated.png` | Colour raccoon rotated 90° counter-clockwise with `np.rot90()` |
+| `plots/raccoon_solarised.png` | Colour raccoon inverted with `255 - img` |
+| `plots/macarons_original.png` | Custom macaron photograph loaded with Pillow |
+| `plots/macarons_inverted.png` | Macaron image colour-inverted with `255 - img_array` |
 
 ---
 
-## 7. Configuration reference
+## Operations Reference
 
 | Value | Location | Description |
 |---|---|---|
-| `"../data/yummy_macarons.jpg"` | `practice/A_01_NumPy_Exercises.ipynb` cell 68 | Relative path from `practice/` to image file |
-| `grey_vals = np.array([0.2126, 0.7152, 0.0722])` | `practice/A_01_NumPy_Exercises.ipynb` | ITU-R BT.709 luminance weights for RGB→greyscale |
-| `noise = np.random.random((128, 128, 3))` | `practice/A_01_NumPy_Exercises.ipynb` | Fixed shape for the noise image challenge |
+| `"../../data/yummy_macarons.jpg"` | `notebooks/analysis/A_01_NumPy_Exercises.ipynb` | Relative path from `notebooks/analysis/` to image file |
+| `grey_vals = np.array([0.2126, 0.7152, 0.0722])` | `notebooks/analysis/A_01_NumPy_Exercises.ipynb` | ITU-R BT.709 luminance weights for RGB→greyscale |
+| `noise = np.random.random((128, 128, 3))` | `notebooks/analysis/A_01_NumPy_Exercises.ipynb` | Fixed shape for the noise image |
 
 ---
 
-## 8. Course context
+## Background
 
 100 Days of Code: The Complete Python Pro Bootcamp — Day 77: Computation with NumPy and N-Dimensional Arrays.  
 See [docs/COURSE_NOTES.md](docs/COURSE_NOTES.md) for the full exercise brief and concept summary.
 
 ---
 
-## 9. Dependencies
+## Dependencies
 
 | Module | Used in | Purpose |
 |---|---|---|
 | `numpy` | All notebooks | ndarray creation, manipulation, math operations |
-| `matplotlib` | `theory/02__`, `theory/03__`, `theory/04__`, `practice/A_01__` | Plotting arrays and displaying images |
-| `scipy` | `theory/04__`, `practice/A_01__` | Built-in raccoon sample image (`scipy.datasets.face()`) |
-| `Pillow` | `theory/04__`, `practice/A_01__` | Loading local JPEG files with `Image.open()` |
+| `matplotlib` | `notebooks/concepts/02__`, `03__`, `04__`, `notebooks/analysis/` | Plotting arrays and displaying images |
+| `scipy` | `notebooks/concepts/04__`, `notebooks/analysis/` | Built-in raccoon sample image (`scipy.datasets.face()`) |
+| `Pillow` | `notebooks/concepts/04__`, `notebooks/analysis/` | Loading local JPEG files with `Image.open()` |
 | `notebook` | All | Jupyter Notebook server |
