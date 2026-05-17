@@ -6,9 +6,9 @@ featured: false
 tags: data-analysis, visualisation, python, CI-CD
 tech_stack: Python, NumPy, Matplotlib, SciPy, Pillow, Jupyter, GitHub Actions
 repo_url: https://github.com/xavier-oc-programming/numpy-ndarray-computation
-live_url: https://xavier-oc-programming.github.io/numpy-ndarray-computation/notebook/
+live_url: https://xavier-oc-programming.github.io/numpy-ndarray-computation/notebook_web_render/
 demo_url:
-notebook_url: https://xavier-oc-programming.github.io/numpy-ndarray-computation/notebook/
+notebook_url: https://xavier-oc-programming.github.io/numpy-ndarray-computation/notebook_web_render/
 
 short_description: |
   NumPy treats images as numbers — a 768 × 1024 photograph is a 3D array of integers. This project works through ndarray operations from first principles: slicing, broadcasting, matrix multiplication, and pixel-level transforms like greyscale conversion and colour inversion.

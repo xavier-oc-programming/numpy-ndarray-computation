@@ -121,7 +121,7 @@ numpy-ndarray-computation/
 │
 ├── plots/                                # All saved charts (150 dpi)
 │
-├── notebook/
+├── notebook_web_render/
 │   └── index.html                        # Rendered notebook (GitHub Pages)
 │
 ├── docs/
