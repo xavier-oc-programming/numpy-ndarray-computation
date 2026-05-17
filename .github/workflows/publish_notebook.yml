@@ -31,16 +31,15 @@ jobs:
             --output index.html \
             notebooks/analysis/A_01_NumPy_Exercises.ipynb
 
-      - name: Move to notebook directory
+      - name: Build site
         run: |
-          mkdir -p notebook_web_render
-          mv index.html notebook_web_render/index.html
+          mkdir -p _site/notebook_web_render
+          mv notebooks/analysis/index.html _site/notebook_web_render/index.html
+          cp index.html _site/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: notebook_web_render
-          destination_dir: notebook_web_render
-          keep_files: true
+          publish_dir: _site
